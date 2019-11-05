@@ -146,8 +146,10 @@ module.exports = class CekBRI {
                     if (data) {
                         const ytuber_subscribers_data = JSON.parse(data[0]);
                         const ytuber_views_data = JSON.parse(data[1]);
-                        const ytuber_views_w_data = JSON.parse(data[2]);
-                        const ytuber_subs_w_data = JSON.parse(data[3]);
+                        const ytuber_subs_m_data = JSON.parse(data[2]);
+                        const ytuber_views_m_data = JSON.parse(data[3]);
+                        const ytuber_subs_w_data = JSON.parse(data[4]);
+                        const ytuber_views_w_data = JSON.parse(data[5]);
                         Ytuber.findOne({ _id: ytuber_link }, (e, res_f) => {
                             if (e) console.log(e);
                             else if (res_f) {
@@ -175,6 +177,8 @@ module.exports = class CekBRI {
                                     "img_link": ytuber_img,
                                     "subscribers": ytuber_subscribers_data,
                                     "views": ytuber_views_data,
+                                    "total_subs_monthly": ytuber_subs_m_data,
+                                    "total_views_monthly": ytuber_views_m_data,
                                     "total_subs_weekly": ytuber_subs_w_data,
                                     "total_views_weekly": ytuber_views_w_data,
                                 }, (err, res) => {
@@ -194,10 +198,12 @@ module.exports = class CekBRI {
                             const ytuber_img = element.attr('src');
                             const ytuber_name = element.attr('alt');
                             const data = pages.match(/(?<=data:)(\[.*?\]\])/g)
-                            const ytuber_subscribers_data = JSON.parse(data[0][0]);
-                            const ytuber_views_data = JSON.parse(data[1][0]);
-                            const ytuber_views_w_data = JSON.parse(data[2][0]);
-                            const ytuber_subs_w_data = JSON.parse(data[3][0]);
+                            const ytuber_subscribers_data = JSON.parse(data[0]);
+                            const ytuber_views_data = JSON.parse(data[1]);
+                            const ytuber_subs_m_data = JSON.parse(data[2]);
+                            const ytuber_views_m_data = JSON.parse(data[3]);
+                            const ytuber_subs_w_data = JSON.parse(data[4]);
+                            const ytuber_views_w_data = JSON.parse(data[5]);
                             Ytuber.findOne({ _id: ytuber_link }, (e, res_f) => {
                                 if (e) console.log(e);
                                 else if (res_f) {
@@ -225,6 +231,8 @@ module.exports = class CekBRI {
                                         "img_link": ytuber_img,
                                         "subscribers": ytuber_subscribers_data,
                                         "views": ytuber_views_data,
+                                        "total_subs_monthly": ytuber_subs_m_data,
+                                        "total_views_monthly": ytuber_views_m_data,
                                         "total_subs_weekly": ytuber_subs_w_data,
                                         "total_views_weekly": ytuber_views_w_data,
                                     }, (err, res) => {
