@@ -8,6 +8,8 @@ var YtuberSchema = new Schema({
     "img_link": String,
     "subscribers": Array,
     "views": Array,
+    "total_subs_weekly": Array,
+    "total_views_weekly": Array,
 
 }, { collection: 'ytuber' });
 
