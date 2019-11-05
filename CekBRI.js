@@ -54,18 +54,18 @@ module.exports = class CekBRI {
                 // cb(null, 'getListHtml ok')
                 this._step = 2;
                 let task = [];
-                this._links.forEach( ( link, i )=>{
-                    task.push( (cb_1)=>{
-                        if( link ){
+                this._links.forEach((link, i) => {
+                    task.push((cb_1) => {
+                        if (link) {
                             this.getYtuberHtml(link, cb_1)
-                        } else{
+                        } else {
                             cb_1(null, `Invalid: ${link}`)
                         }
-                    } )
+                    })
                 })
 
-                async.series(task, (e_f, final)=>{
-                    if(e_f) console.log(e_f)
+                async.series(task, (e_f, final) => {
+                    if (e_f) console.log(e_f)
                     else {
                         console.log(final);
                         cb(null, 'ok')
@@ -115,49 +115,123 @@ module.exports = class CekBRI {
     getYtuberHtml(channel, cb) {
         console.log('2. Opening ' + channel + ' page...');
         let ytuber_link = `https://socialblade.com${channel.replace(/\/user\//, '/channel/UC')}/monthly`
-        cloudscraper.get(ytuber_link).then((html) => {
-            const pages = html.replace(/\r?\n|\r|\s/g, '');
-            const $ = cheerio.load(html);
-            const element = $('#YouTubeUserTopInfoAvatar');
-            const ytuber_img = element.attr('src');
-            const ytuber_name = element.attr('alt');
-            const data = pages.match(/(?<=data:)(\[.*?\]\])/g)
-            const ytuber_subscribers_data = data[0];
-            const ytuber_views_data = data[1];
-            Ytuber.findOne({ _id: ytuber_link }, (e,res_f)=>{
-                if(e) console.log(e);
-                    else if(res_f){
-                        console.log(`3. Updating `,ytuber_name);
-                        Ytuber.updateOne({
-                            "_id": ytuber_link
-                        }, {
-                            "nama_channel": ytuber_name,
-                            "img_link": ytuber_img,
-                            "subscribers": ytuber_subscribers_data,
-                            "views": ytuber_views_data,
-                        }, (err, res)=>{
-                            if(err) console.log(err);
-                            if (this._step === 2) {
-                                cb(null, `Done: ${ytuber_name}`)
-                            }
-                        })
-                    } else{
-                        console.log(`3. Creating `,ytuber_name);
-                        Ytuber.create({
-                            "_id": ytuber_link,
-                            "nama_channel": ytuber_name,
-                            "img_link": ytuber_img,
-                            "subscribers": ytuber_subscribers_data,
-                            "views": ytuber_views_data,
-                        }, (err, res)=>{
-                            if(err) console.log(err);
-                            if (this._step === 2) {
-                                cb(null, `Done: ${ytuber_name}`)
-                            }
-                        })
+        Ytuber.findOne({ _id: ytuber_link }, (e, res_f) => {
+            if (e) console.log(e);
+            else if (res_f) {
+                cb(null, `Done`);
+                return;
+                console.log(`3. Updating `, ytuber_name);
+                Ytuber.updateOne({
+                    "_id": ytuber_link
+                }, {
+                    "nama_channel": ytuber_name,
+                    "img_link": ytuber_img,
+                    "subscribers": ytuber_subscribers_data,
+                    "views": ytuber_views_data,
+                }, (err, res) => {
+                    if (err) console.log(err);
+                    if (this._step === 2) {
+                        cb(null, `Done: ${ytuber_name}`)
                     }
-            })
-        }, console.error);
+                })
+            } else {
+                cloudscraper.get(ytuber_link).then((html) => {
+                    const pages = html.replace(/\r?\n|\r|\s/g, '');
+                    const $ = cheerio.load(html);
+                    const element = $('#YouTubeUserTopInfoAvatar');
+                    const ytuber_img = element.attr('src');
+                    const ytuber_name = element.attr('alt');
+                    const data = pages.match(/(?<=data:)(\[.*?\]\])/g)
+                    //jika link valid
+                    if (data) {
+                        const ytuber_subscribers_data = data[0];
+                        const ytuber_views_data = data[1];
+                        Ytuber.findOne({ _id: ytuber_link }, (e, res_f) => {
+                            if (e) console.log(e);
+                            else if (res_f) {
+                                cb(null, `Done: ${ytuber_name}`);
+                                return;
+                                console.log(`3. Updating `, ytuber_name);
+                                Ytuber.updateOne({
+                                    "_id": ytuber_link
+                                }, {
+                                    "nama_channel": ytuber_name,
+                                    "img_link": ytuber_img,
+                                    "subscribers": ytuber_subscribers_data,
+                                    "views": ytuber_views_data,
+                                }, (err, res) => {
+                                    if (err) console.log(err);
+                                    if (this._step === 2) {
+                                        cb(null, `Done: ${ytuber_name}`)
+                                    }
+                                })
+                            } else {
+                                console.log(`3. Creating `, ytuber_name);
+                                Ytuber.create({
+                                    "_id": ytuber_link,
+                                    "nama_channel": ytuber_name,
+                                    "img_link": ytuber_img,
+                                    "subscribers": ytuber_subscribers_data,
+                                    "views": ytuber_views_data,
+                                }, (err, res) => {
+                                    if (err) console.log(err);
+                                    if (this._step === 2) {
+                                        cb(null, `Done: ${ytuber_name}`)
+                                    }
+                                })
+                            }
+                        })
+                    } else { //jika tdk valid
+                        ytuber_link = `https://socialblade.com${channel.replace(/\/user\//, '/channel/')}/monthly`
+                        cloudscraper.get(ytuber_link).then((html) => {
+                            const pages = html.replace(/\r?\n|\r|\s/g, '');
+                            const $ = cheerio.load(html);
+                            const element = $('#YouTubeUserTopInfoAvatar');
+                            const ytuber_img = element.attr('src');
+                            const ytuber_name = element.attr('alt');
+                            const data = pages.match(/(?<=data:)(\[.*?\]\])/g)
+                            const ytuber_subscribers_data = data[0];
+                            const ytuber_views_data = data[1];
+                            Ytuber.findOne({ _id: ytuber_link }, (e, res_f) => {
+                                if (e) console.log(e);
+                                else if (res_f) {
+                                    cb(null, `Done: ${ytuber_name}`);
+                                    return;
+                                    console.log(`3. Updating `, ytuber_name);
+                                    Ytuber.updateOne({
+                                        "_id": ytuber_link
+                                    }, {
+                                        "nama_channel": ytuber_name,
+                                        "img_link": ytuber_img,
+                                        "subscribers": ytuber_subscribers_data,
+                                        "views": ytuber_views_data,
+                                    }, (err, res) => {
+                                        if (err) console.log(err);
+                                        if (this._step === 2) {
+                                            cb(null, `Done: ${ytuber_name}`)
+                                        }
+                                    })
+                                } else {
+                                    console.log(`3. Creating `, ytuber_name);
+                                    Ytuber.create({
+                                        "_id": ytuber_link,
+                                        "nama_channel": ytuber_name,
+                                        "img_link": ytuber_img,
+                                        "subscribers": ytuber_subscribers_data,
+                                        "views": ytuber_views_data,
+                                    }, (err, res) => {
+                                        if (err) console.log(err);
+                                        if (this._step === 2) {
+                                            cb(null, `Done: ${ytuber_name}`)
+                                        }
+                                    })
+                                }
+                            })
+                        }, console.error);
+                    }
+                }, console.error);
+            }
+        })
 
     }
 }
