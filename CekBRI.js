@@ -18,7 +18,7 @@ module.exports = class CekBRI {
 
     constructor() {
         //target link
-        this._urlList = 'https://socialblade.com/youtube/top/country/id/mostsubscribed';
+        this._urlList = 'https://socialblade.com/youtube/top/country/in/mostsubscribed';
         // this._urlPrefix = 'https://socialblade.com/youtube/channel/UCaKLg1ELiX0zTJ6Je3c5esA/monthly'
         this._links = [];
         this._step = 1;
